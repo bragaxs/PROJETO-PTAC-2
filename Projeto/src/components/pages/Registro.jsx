@@ -1,39 +1,24 @@
-import { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+const express = require('express');
+const app = express();
+const port = 3000;
 
-export default function Registrar() {
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const navigation = useNavigate();
+app.use(express.json());
 
-  const registrarPessoa = async(event) =>{
-    event.preventDefault();
-    try {
-      const resposta = await fetch('http://localhost:3000/usuarios',{
-          method: 'POST',
-          headers: {'Content-type': 'Application/json'},
-          body: JSON.stringify({
-            nome: nome,
-            email: email
-          })
-      });
+let usuarios = [
+  { id: 1, nome: 'João', email: 'joao@example.com' },
+  { id: 2, nome: 'Maria', email: 'maria@example.com' }
+];
 
-      if (resposta.ok) {
-        navigation('/')
-      }
+app.get('/usuarios', (req, res) => {
+  res.json(usuarios);
+});
 
-    } catch{
-      alert('Ocorreu um erro na aplicação!');
-    }
-  }
+app.delete('/usuarios/:id', (req, res) => {
+  const { id } = req.params;
+  usuarios = usuarios.filter(usuario => usuario.id != id);
+  res.status(204).send();
+});
 
-  return (
-        <main>
-          <form onSubmit={registrarPessoa}>
-            <input type="text" name="" id="" placeholder="Nome"   value={nome} onChange={(event=> setNome(event.target.value))}/>
-            <input type="email" name="" id=""  placeholder="Email" value={email} onChange={(event)=> setEmail(event.target.value)}/>
-            <button>Salvar</button>
-          </form>
-        </main>
-  );
-}
+app.listen(port, () => {
+  console.log(`Servidor rodando em http://localhost:${port}`);
+});
